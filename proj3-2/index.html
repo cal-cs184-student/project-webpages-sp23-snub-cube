@@ -23,15 +23,18 @@
 
         <h3 align="middle">Overview</h3>
         <p>
-            In this project I added additional features to my pathtracing program. 
-            I chose to add BSDFs for Mirror and Glass Materials. By modeling the mathmatics/physics behind
-            light behavior around reflective and refracting objects using vectors and simple physics,
-            I was able to render realistic scenes containing such objects. I also implemented support for Microfacet Materials.
-            By using normal distribution functions and an alpha parameter, different surface qualities such as shiny and dull can be modeled.
-            By using BRDFs and reflection indices, different metallic surfaces can be rendered convincingly using importance sampling.
+            In this project I added additional features to my pathtracing program (Mirror and Glass Materials + Microfacet Materials). <br>
+            For both parts, support for rendering realistic reflective/refrative/metallic objects are achieved by modeling the mathmatics/physics behind
+            light behavior in the real world.
         </p>
 
         <h3 align="middle">Part 1. Mirror and Glass Materials</h3>
+        <p>
+            In this part, reflection and refraction BSDFs are implemented to render mirror and glass, respectively.
+            The former involved a simple changing of vector direction of the incoming light while setting the pdf to 1 because no sampling were done.
+            The latter took into account 
+            an index of reflection as light enters the material and calculates if a total internal refraction occurs, in which light wouldn't be coming out.
+        </p>
         <p><b>
             Show a sequence of six images of scene `CBspheres.dae` rendered with `max_ray_depth` set to 0, 1, 2, 3, 4, 5, and 100. The other settings should be at least 64 samples per pixel and 4 samples per light. Make sure to include all screenshots.
         </b></p>
@@ -105,6 +108,14 @@
         <br>
 
         <h3 align="middle">Part 2. Microfacet Material</h3>
+        <p>
+            In this part BRDF for Microfacet Materials are implemented.
+            By using Normal Distribution Function (Beckmann distribution) and an alpha parameter, different surface qualities such as shiny and dull can be modeled.
+            The NDF determines the distribution of microfacet normals, which play a critical role in determining the ability of incoming light to be reflected.
+            As alpha increases, the appearance of the surface becomes duller / rougher.
+            By implementing reflection indices (Fresnel terms at 3 set wavelengths), different metallic materials can be rendered convincingly.
+            Finally, importance sampling can render more smoothly and realistically than cosine hemisphere sampling can.
+        </p>
         <p><b>
             Show a screenshot sequence of 4 images of scene `CBdragon_microfacet_au.dae` rendered with $\alpha$ set to 0.005, 0.05, 0.25 and 0.5. The other settings should be at least 128 samples per pixel and 1 samples per light. The number of bounces should be at least 5. Describe the differences between different images. Note that, to change the $\alpha$, just open the .dae file and search for `microfacet`.
         </b></p>
