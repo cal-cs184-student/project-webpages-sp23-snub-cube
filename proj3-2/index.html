@@ -1,7 +1,188 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Project 3-2 here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>  
+    div.padded {  
+      padding-top: 0px;  
+      padding-right: 100px;  
+      padding-bottom: 0.25in;  
+      padding-left: 100px;  
+    }  
+  </style> 
+<title>Morgan Lyu  |  CS 184</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+</head>
+<body>
+<br />
+<h1 align="middle">Assignment 3-2: Additional Features to PathTracer</h1>
+    <h2 align="middle">Morgan Lyu</h2>
+    <h2 align="middle">https://cal-cs184-student.github.io/project-webpages-sp23-snub-cube/proj3-2/index.html</h2>
+
+    <div class="padded">
+
+        <h3 align="middle">Overview</h3>
+        <p>
+            In this project I added additional features to my pathtracing program. 
+            I chose to add BSDFs for Mirror and Glass Materials. By modeling the mathmatics/physics behind
+            light behavior around reflective and refracting objects using vectors and simple physics,
+            I was able to render realistic scenes containing such objects. I also implemented support for Microfacet Materials.
+            By using normal distribution functions and an alpha parameter, different surface qualities such as shiny and dull can be modeled.
+            By using BRDFs and reflection indices, different metallic surfaces can be rendered convincingly using importance sampling.
+        </p>
+
+        <h3 align="middle">Part 1. Mirror and Glass Materials</h3>
+        <p><b>
+            Show a sequence of six images of scene `CBspheres.dae` rendered with `max_ray_depth` set to 0, 1, 2, 3, 4, 5, and 100. The other settings should be at least 64 samples per pixel and 4 samples per light. Make sure to include all screenshots.
+        </b></p>
+        <p>
+            <div align="middle">
+                <table style="width:100%">
+                  <tr align="center">
+                    <td>
+                      <img src="images/0-0.png" align="middle" width="400px"/>
+                      <figcaption>max_ray_depth = 0</figcaption>
+                    </td>
+                    <td>
+                      <img src="images/0-1.png" align="middle" width="400px"/>
+                      <figcaption>max_ray_depth = 1</figcaption>
+                    </td>
+                  </tr>
+                  <tr align="center">
+                    <td>
+                      <img src="images/0-2.png" align="middle" width="400px"/>
+                      <figcaption>max_ray_depth = 2</figcaption>
+                    </td>
+                    <td>
+                      <img src="images/0-3.png" align="middle" width="400px"/>
+                      <figcaption>max_ray_depth = 3</figcaption>
+                    </td>
+                  </tr>
+                  <tr align="center">
+                    <td>
+                      <img src="images/0-4.png" align="middle" width="400px"/>
+                      <figcaption>max_ray_depth = 4</figcaption>
+                    </td>
+                    <td>
+                      <img src="images/0-5.png" align="middle" width="400px"/>
+                      <figcaption>max_ray_depth = 5</figcaption>
+                    </td>
+                  </tr>
+                  <tr align="center">
+                    <td>
+                      <img src="images/0-6.png" align="middle" width="400px"/>
+                      <figcaption>max_ray_depth = 100</figcaption>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <br>
+        </p>
+        <br>
+        <p><b>
+            Point out the new multibounce effects that appear in each image. 
+        </b></p>
+        <p>
+            On bounce 0 only the light source shows. <br>
+            On bounce 1 the room and light source reflected on the spheres are added. <br>
+            On bounce 2 the reflections on spheres are added with the mirror sphere's being more clear than the glass sphere's. <br>
+            Global illumination also colors the shadows. <br>
+            On bounce 3 the glass sphere is rendered but the change isn't reflected yet on the mirror.<br>
+            On bounce 4 and this is corrected.<br>
+        </p>
+        <br>
+        <p><b>
+            Explain how these bounce numbers relate to the particular effects that appear. Make sure to include all screenshots.
+        </b></p>
+        <p>
+            On bounce 0 we only see the light source because it is the only surface emitting light straight to the camera without any transition bounces in the midlle.<br>
+            On bounce 1 we see the room but not the spheres because the spheres themselves do not have inherent colors. They need to reflect the surrounding light which hasn't reached them yet.<br>
+            On bounce 2 we see the scene reflected in the spheres because the light bounced on them. We still don't see the refraction because the light rays have only just entered the glass sphere.<br>
+            On bounce 3 the refraction in the glass sphere is rendered but its reflection in the mirror ball hasn't updated yet. We will always see the reflection lag behind the rest of the scene.<br>
+            On bounce 4 reflection on the mirror updates the refraction ball from last bounce while refraction gets brighter due to increased global illumination.<br>
+            Bounce 5 to bounce 100: nothing too different / scene converges as most bounces are filtered by russian roulette.
+        </p>
+        <br>
+
+        <h3 align="middle">Part 2. Microfacet Material</h3>
+        <p><b>
+            Show a screenshot sequence of 4 images of scene `CBdragon_microfacet_au.dae` rendered with $\alpha$ set to 0.005, 0.05, 0.25 and 0.5. The other settings should be at least 128 samples per pixel and 1 samples per light. The number of bounces should be at least 5. Describe the differences between different images. Note that, to change the $\alpha$, just open the .dae file and search for `microfacet`.
+        </b></p>
+        <p>
+            <div align="middle">
+                <table style="width:100%">
+                  <tr align="center">
+                    <td>
+                      <img src="images/2-1.png" align="middle" width="400px"/>
+                      <figcaption>alpha = 0.005</figcaption>
+                    </td>
+                    <td>
+                      <img src="images/2-2.png" align="middle" width="400px"/>
+                      <figcaption>alpha = 0.05</figcaption>
+                    </td>
+                  </tr>
+                  <tr align="center">
+                    <td>
+                      <img src="images/2-3.png" align="middle" width="400px"/>
+                      <figcaption>alpha = 0.25</figcaption>
+                    </td>
+                    <td>
+                      <img src="images/2-4.png" align="middle" width="400px"/>
+                      <figcaption>alpha = 0.5</figcaption>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+        </p>
+        <p>
+            As alpha increases, the surface of the object gets rougher (less shiny) and the render scene gets less noisy.
+        </p>
+        <br>
+        <p><b>
+            Show two images of scene `CBbunny_microfacet_cu.dae` rendered using cosine hemisphere sampling (default) and your importance sampling.
+            The sampling rate should be fixed at 64 samples per pixel and 1 samples per light. The number of bounces should be at least 5.
+            Briefly discuss their difference.
+        </b></p>
+        <p>
+            <div align="middle">
+                <table style="width:100%">
+                  <tr align="center">
+                    <td>
+                      <img src="images/3-2.png" align="middle" width="400px"/>
+                      <figcaption>cosine hemisphere sampling</figcaption>
+                    </td>
+                    <td>
+                      <img src="images/3-1.png" align="middle" width="400px"/>
+                      <figcaption>importance sampling</figcaption>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+        </p>
+        <p>
+            Cosine hemisphere sampling gives a rougher result especially around the edge whereas importance sampling is more smooth.
+        </p>
+        <br>
+        <p><b>
+            Show at least one image with some other conductor material, replacing `eta` and `k`. Note that you should look up values for real data rather than modifying them arbitrarily. Tell us what kind of material your parameters correspond to. 
+        </b></p>
+        <p>
+            <div align="middle">
+                <table style="width:100%">
+                  <tr align="center">
+                    <td>
+                      <img src="images/4-1.png" align="middle" width="400px"/>
+                      <figcaption>aluminum, alpha = 0.5</figcaption>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+        </p>
+        <br>
+        
+    
+
+    </div>
+</body>
 </html>
+
